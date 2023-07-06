@@ -1,10 +1,12 @@
 const fs = require('fs');
-const executeQuery = require('../database-utils/execute-query');
+
 
 module.exports = {
     async create(req, res, next) {
         try {
-            const sql = `INSERT INTO products (name, category_id, quantity_in_stock, image_path) VALUES ('${req.body.name}','${req.body.categoryId}', ${req.body.quantityInStock} , ${req.body.imagePath ? "'"+req.body.imagePath+"'": null});`;
+            const sql = `INSERT INTO products (company, name,email,userType, joiningDate) VALUES
+             ('${req.body.company}' '${req.body.name}' ${req.body.email} ,
+              ${req.body.userType ? "'" + req.body.joiningDate + "'" : null});`;
             const result =  await executeQuery(sql);
             return res.send(result);
         } catch (error) {
@@ -14,10 +16,10 @@ module.exports = {
 
     async createMany(req, res, next){
         try{         
-            let sql = `INSERT INTO products (name, category_id, quantity_in_stock, image_path) VALUES `; 
+            let sql = `INSERT INTO products (company, name, email, userType, joiningDate) VALUES `; 
             let counter = 0;
             for(let one of req.body){
-                sql += `('${one.name}',${one.categoryId}, ${one.quantityInStock}, ${one.imagePath ? "'"+one.imagePath+"'": null})`
+                sql += `( '${one.company}','${one.name}',${one.email} ${one.userType ? "'"+one.joiningDate+"'": null})`
                 counter ++;
                 if(counter < req.body.length){
                     sql += `,`;
@@ -38,7 +40,7 @@ module.exports = {
             if(!id){
              return res.status(400).send('id is required');
             }
-            const result = await executeQuery(`SELECT * FROM products WHERE id = ${+id}`)
+            const result = await executeQuery(`SELECT * FROM breakfast WHERE id = ${+id}`)
             if(Array.isArray(result) && result.length){
                 return res.status(200).send(result[0]);
             }
@@ -57,7 +59,7 @@ module.exports = {
             ids = ids.split(",");
             ids = ids.map(id=>Number(id));
 
-            const result = await executeQuery(`SELECT * FROM products WHERE id IN(${ids})`)
+            const result = await executeQuery(`SELECT * FROM breakfast WHERE id IN(${ids})`)
             if(Array.isArray(result) && result.length){
                 return res.status(200).send(result);
             }
@@ -73,7 +75,7 @@ module.exports = {
     async listAll(req, res) {
         try {
             //const sql = `SELECT categories.name as categoryName, products.*  FROM categories INNER JOIN products ON products.category_id = categories.id`;
-            const sql = `SELECT products.*, categories.name as categoryName  FROM products LEFT JOIN categories ON products.category_id = categories.id`;
+            const sql = `SELECT data.*, data.name as dataName  FROM breastfast LEFT JOIN admin breakfast.data_id = admin.id`;
             const results = await executeQuery(sql);
             return res.status(200).send(results);
         } catch (error) {
@@ -87,7 +89,7 @@ module.exports = {
             if(!id){
              return res.status(400).send('id is required');
             }
-            const sql = `DELETE FROM products WHERE id = ${+id};`;
+            const sql = `DELETE FROM breakfast WHERE id = ${+id};`;
             const result = await executeQuery(sql);
             return res.status(200).send(result);
         } catch (error) {
@@ -106,14 +108,14 @@ module.exports = {
                 return res.status(400).send('name is required');
             }
 
-            const exisitingproducts = await executeQuery(`SELECT * FROM products WHERE id = ${+id}`);
+            const exisitingproducts = await executeQuery(`SELECT * FROM breakfast WHERE id = ${+id}`);
             if(Array.isArray(exisitingproducts) && exisitingproducts.length){
-                const sql = `UPDATE products SET name = '${name.trim()}' WHERE id = ${+id};`;
+                const sql = `UPDATE breakfast SET name = '${name.trim()}' WHERE id = ${+id};`;
                 const result = await executeQuery(sql);
                 return res.status(200).send(result);
             }
 
-            return res.status(404).send(`product with id ${id} not found`);
+            return res.status(404).send(`data with id ${id} not found`);
 
         } catch (error) {
             return res.status(500).send({ error });

@@ -1,6 +1,7 @@
-const mysql2 = require('mysql2/promise');
-module.exports = async()=>{
-    let connection = mysql2.createConnection({
+const mysql = require('mysql2/promise');
+module.exports = async () => {
+    console.log("user", process.env.user)
+    let connection = mysql.createConnection({
         port: Number(process.env.mysqlport),
         host: process.env.mysqlhost,
         user: process.env.user,
